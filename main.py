@@ -37,8 +37,8 @@ keep_alive()
 API_TOKEN = os.getenv("API_TOKEN")
 CHANNELS = []
 LINKS = []
-MAIN_CHANNELS = []
-MAIN_LINKS = []
+MAIN_CHANNELS = ["-1002362274987"]
+MAIN_LINKS = ["https://t.me/+lNoJK7cVEMgzNjhi"]
 BOT_USERNAME = os.getenv("BOT_USERNAME")
 
 bot = Bot(token=API_TOKEN)
