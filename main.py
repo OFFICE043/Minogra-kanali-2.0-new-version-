@@ -14,6 +14,7 @@ from aiogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 )
 from aiogram.utils import executor
+from aiogram import executor
 from keep_alive import keep_alive
 from database import (
     init_db,
@@ -890,5 +891,20 @@ async def on_startup(dp):
     await init_db()
     print("✅ PostgreSQL bazaga ulandi!")
 
+
+async def on_startup(dp):
+    await bot.set_webhook("https://anifinx-bot.onrender.com/webhook")
+
+async def on_shutdown(dp):
+    await bot.delete_webhook()
+
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    executor.start_webhook(
+        dispatcher=dp,
+        webhook_path="/webhook",
+        skip_updates=True,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        host="0.0.0.0",
+        port=8080,
+    )
