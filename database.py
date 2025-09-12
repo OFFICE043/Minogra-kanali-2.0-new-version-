@@ -10,13 +10,26 @@ db_pool = None
 # === Databasega ulanish ===
 async def init_db():
     global db_pool
-    db_pool = await asyncpg.create_pool(
-        dsn=os.getenv("DATABASE_URL"),  # faqat URL orqali ulanish
-        ssl="require",
-        statement_cache_size=0
-    )
+    if db_pool is None or db_pool._closed:  # Agar pool yopilgan bo‘lsa, qaytadan ochamiz
+        db_pool = await asyncpg.create_pool(
+            dsn=os.getenv("DATABASE_URL"),  # faqat URL orqali ulanish
+            ssl="require",
+            statement_cache_size=0
+        )
+    return db_pool
 
-    async with db_pool.acquire() as conn:
+# Ulashish olish uchun
+async def get_connection():
+    pool = await init_db()
+    try:
+        return await pool.acquire()
+    except Exception:
+        # Agar ulanish uzilib qolsa, qayta pool ochamiz
+        global db_pool
+        db_pool = None
+        pool = await init_db()
+        return await pool.acquire()
+
         # === Foydalanuvchilar ===
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
